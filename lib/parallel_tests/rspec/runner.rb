@@ -68,6 +68,21 @@ module ParallelTests
           "\e[#{color}m#{text}\e[0m"
         end
 
+        def find_failed_examples(test_outputs)
+          failed_examples = []
+
+          test_outputs.each do |test_output|
+            test_output.lines.each_with_index do |line, index|
+              if line.include?("Failed examples:\n")
+                failed_examples += test_output.lines[index, test_output.lines.size]
+                break
+              end
+            end
+          end
+
+          failed_examples.uniq
+        end
+
         private
 
         def color

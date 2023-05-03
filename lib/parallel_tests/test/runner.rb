@@ -277,6 +277,10 @@ module ParallelTests
           end
         end
 
+        def find_failed_examples(test_outputs)
+          # NotImplemented
+        end
+
         private
 
         # fill gaps with unknown-runtime if given, average otherwise

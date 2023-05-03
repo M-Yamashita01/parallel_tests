@@ -137,6 +137,10 @@ module ParallelTests
       results = @runner.find_results(test_results.map { |result| result[:stdout] } * "")
       puts ""
       puts @runner.summarize_results(results)
+      if options[:summary] && ParallelTests.determine_number_of_processes(options[:count]) > 1
+        puts ""
+        puts @runner.find_failed_examples(test_results.map { |result| result[:stdout] })
+      end
 
       report_failure_rerun_commmand(test_results, options)
     end
@@ -285,6 +289,8 @@ module ParallelTests
           puts opts
           exit 0
         end
+
+        opts.on("--summary", "Show summary report of failed tests") { options[:summary] = true }
       end.parse!(argv)
 
       raise "Both options are mutually exclusive: verbose & quiet" if options[:verbose] && options[:quiet]

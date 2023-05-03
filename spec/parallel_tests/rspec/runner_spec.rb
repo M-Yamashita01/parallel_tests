@@ -215,4 +215,40 @@ describe ParallelTests::RSpec::Runner do
       expect(call("--order", "random:123")).to eq(["--seed", "555"])
     end
   end
+
+  describe ".find_failed_examples" do
+    it "adds the randomized seed" do
+      output = <<-OUT.gsub(/^        /, '')
+        ....F...
+        Finished in 0.13184 seconds (files took 0.54384 seconds to load)
+        2 examples, 1 failure
+        
+        Failed examples:
+        
+        rspec ./spec/knapsack/presenter_spec.rb:112 # Knapsack::Presenter.pretty_seconds when less then one second is expected to eql "0.986s"
+        
+      OUT
+
+      output2 = <<-OUT.gsub(/^        /, '')
+        ....F...
+        Finished in 1.85 seconds (files took 0.5129 seconds to load)
+        2 examples, 1 failure
+        
+        Failed examples:
+        
+        rspec ./spec/knapsack/tracker_spec.rb:36 # Knapsack::Tracker#config when didn't pass options is expected to eql {:enable_time_offset_warning=>true, :generate_report=>false, :time_offset_in_seconds=>20}
+        
+      OUT
+
+      expect_str =
+        [
+          "Failed examples:\n",
+          "\n",
+          "rspec ./spec/knapsack/presenter_spec.rb:112 # Knapsack::Presenter.pretty_seconds when less then one second is expected to eql \"0.986s\"\n",
+          "rspec ./spec/knapsack/tracker_spec.rb:36 # Knapsack::Tracker#config when didn't pass options is expected to eql {:enable_time_offset_warning=>true, :generate_report=>false, :time_offset_in_seconds=>20}\n"
+        ]
+
+      expect(ParallelTests::RSpec::Runner.find_failed_examples([output, output2])).to eq(expect_str)
+    end
+  end
 end
